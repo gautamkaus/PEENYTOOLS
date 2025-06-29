@@ -45,10 +45,13 @@ router.post('/', isAdmin, async (req, res) => {
     
     // Add product rates if provided
     if (rates && Array.isArray(rates)) {
+      const now = new Date();
       const rateData = rates.map(rate => ({
         product_id: product.id,
         duration: rate.duration,
-        rate: rate.rate
+        rate: rate.rate,
+        created_at: now,
+        updated_at: now
       }));
       await ProductRate.bulkCreate(rateData);
     }
@@ -84,10 +87,13 @@ router.put('/:id', isAdmin, async (req, res) => {
       await ProductRate.destroy({ where: { product_id: product.id } });
       
       // Add new rates
+      const now = new Date();
       const rateData = rates.map(rate => ({
         product_id: product.id,
         duration: rate.duration,
-        rate: rate.rate
+        rate: rate.rate,
+        created_at: now,
+        updated_at: now
       }));
       await ProductRate.bulkCreate(rateData);
     }

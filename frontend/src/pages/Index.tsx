@@ -9,6 +9,7 @@ import ParticleBackground from '@/components/ui/ParticleBackground';
 import NeonText from '@/components/ui/NeonText';
 import HolographicButton from '@/components/ui/HolographicButton';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
@@ -23,7 +24,7 @@ const Index = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get(`${API_BASE_URL}/api/products`);
         setFeaturedTools(response.data.filter(p => p.featured));
       } catch (error) {
         setFeaturedTools([]);

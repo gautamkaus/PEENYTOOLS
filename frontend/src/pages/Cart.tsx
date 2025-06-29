@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
@@ -56,7 +57,7 @@ const Cart = () => {
     const token = localStorage.getItem('token');
     if (token) {
       // Fetch user info to check admin status
-      axios.get('http://localhost:5000/api/me', {
+      axios.get(`${API_BASE_URL}/api/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => {

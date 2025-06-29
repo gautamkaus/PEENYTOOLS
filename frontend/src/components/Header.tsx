@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Menu, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 const NavLink = ({ to, children, onClick }: { to: string, children: React.ReactNode, onClick?: () => void }) => (
   <Link to={to} className="block sm:inline-block text-foreground hover:text-blue-600 transition-colors py-2 sm:py-0" onClick={onClick}>
@@ -29,7 +30,7 @@ const Header = () => {
       const token = localStorage.getItem('token');
       setIsLoggedIn(!!token);
       if (token) {
-        axios.get('http://localhost:5000/api/me', {
+        axios.get(`${API_BASE_URL}/api/me`, {
           headers: { Authorization: `Bearer ${token}` }
         })
           .then(res => setIsAdmin(!!res.data.is_admin))

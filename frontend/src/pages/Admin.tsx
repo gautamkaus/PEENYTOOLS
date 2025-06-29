@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { format } from 'date-fns';
 import AdminProductManager from '@/components/AdminProductManager';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 const formatINR = (value: number) => {
   if (value == null || isNaN(value)) return '₹0.00';
@@ -36,7 +37,7 @@ const Admin = () => {
 
     const fetchAnalytics = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/orders/analytics', {
+        const response = await axios.get(`${API_BASE_URL}/api/orders/analytics`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(response.data);

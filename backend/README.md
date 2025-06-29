@@ -9,18 +9,15 @@
 
 2. Create a `.env` file in the backend directory:
    ```env
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=yourpassword
-   DB_NAME=pennytools
+   DB_HOST=93.127.206.203
+   DB_USER=peenytoolsadmin
+   DB_PASSWORD=gSMWUo2pljhA4BSif1sF
+   DB_NAME=peenytoolsdb
    DB_PORT=3306
    JWT_SECRET=your_jwt_secret
    ```
 
-3. Create the MySQL database:
-   ```sql
-   CREATE DATABASE pennytools;
-   ```
+3. The database `peenytoolsdb` should already exist on the remote server.
 
 4. Start the backend server:
    ```bash

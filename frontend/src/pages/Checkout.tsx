@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
@@ -110,7 +111,7 @@ const Checkout = () => {
     };
 
     try {
-      await axios.post('http://localhost:5000/api/orders', orderData, {
+      await axios.post(`${API_BASE_URL}/api/orders`, orderData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 

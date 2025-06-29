@@ -24,16 +24,19 @@ router.post('/register', async (req, res) => {
 
 // Login
 router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(404).json({ message: 'Please register yourself, then login.' });
+    }
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     const token = jwt.sign({ id: user.id, email: user.email }, config.jwtSecret);
     res.json({ token, user: { email: user.email, name: user.name, is_admin: !!user.is_admin } });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
 });

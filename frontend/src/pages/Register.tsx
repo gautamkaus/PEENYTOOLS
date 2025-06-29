@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Register = () => {
       if (registerForm.password !== registerForm.confirmPassword) {
         throw new Error('Passwords do not match');
       }
-      const response = await axios.post('http://localhost:5000/api/register', {
+      const response = await axios.post(`${API_BASE_URL}/api/register`, {
         name: registerForm.name,
         email: registerForm.email,
         password: registerForm.password,

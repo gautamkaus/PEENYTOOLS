@@ -6,18 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
+import { API_BASE_URL } from '../lib/config';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/login', form);
+      const response = await axios.post(`${API_BASE_URL}/api/login`, form);
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('userEmail', user.email);
@@ -30,14 +35,13 @@ const LoginForm = () => {
       window.dispatchEvent(new Event('storage'));
       toast({ title: 'Login Successful', description: 'Welcome back to PennyTools!' });
       navigate('/');
-    } catch (error) {
-      toast({
-        title: 'Login Failed',
-        description: error.response?.data?.error || 'Invalid credentials',
-        variant: 'destructive',
-      });
-    } finally {
+    } catch (error: any) {
       setIsLoading(false);
+      if (error.response && error.response.status === 404) {
+        setShowRegisterDialog(true);
+      } else {
+        setError('Invalid credentials');
+      }
     }
   };
 
@@ -86,6 +90,9 @@ const LoginForm = () => {
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </form>
+            {error && (
+              <div className="text-red-600 text-center mt-4">{error}</div>
+            )}
             <div className="text-center mt-6">
               <span className="text-gray-700">Don't have an account? </span>
               <Link to="/register">
@@ -100,6 +107,19 @@ const LoginForm = () => {
           </Link>
         </div>
       </div>
+      <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Registration Required</DialogTitle>
+            <DialogDescription>
+              Please register yourself, then login.<br />
+              <Link to="/register">
+                <Button className="mt-4 w-full">Go to Register</Button>
+              </Link>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -11,8 +11,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import axios from 'axios';
 import { Switch } from '@/components/ui/switch';
+import { API_BASE_URL } from '../lib/config';
 
-const API_URL = 'http://localhost:5000/api/products';
+const API_URL = `${API_BASE_URL}/api/products`;
 
 const getAuthToken = () => localStorage.getItem('token');
 

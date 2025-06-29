@@ -4,6 +4,7 @@ import { format, addMonths } from 'date-fns';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { API_BASE_URL } from '../lib/config';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value: number) => {
@@ -25,7 +26,7 @@ const OrderHistory = () => {
           setLoading(false);
           return;
         }
-        const res = await axios.get('http://localhost:5000/api/orders/my', {
+        const res = await axios.get(`${API_BASE_URL}/api/orders/my`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setOrders(res.data);

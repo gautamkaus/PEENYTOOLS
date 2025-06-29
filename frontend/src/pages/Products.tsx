@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { API_BASE_URL } from '../lib/config';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
@@ -28,11 +29,13 @@ const Products = () => {
   const navigate = useNavigate();
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/api/products`);
         setAllProducts(response.data);
         setProducts(response.data);
       } catch (error) {
@@ -149,7 +152,7 @@ const Products = () => {
     const token = localStorage.getItem('token');
     if (token) {
       // Fetch user info to check admin status
-      axios.get('http://localhost:5000/api/me', {
+      axios.get(`${API_BASE_URL}/api/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => {
