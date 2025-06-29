@@ -69,8 +69,9 @@ jobs:
             docker rm peeny-frontend || true
 
             # Run new containers
+            cp backend/.env ~/.env_tmp
             docker run -d --name peeny-backend \
-              --env-file ~/.env \
+              --env-file ~/.env_tmp \
               -p 5000:5000 --restart unless-stopped \
               ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
 
