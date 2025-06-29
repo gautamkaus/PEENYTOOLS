@@ -1,0 +1,76 @@
+name: CI/CD – PEENYTOOLS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3  # supports multi-arch & BuildKit :contentReference[oaicite:1]{index=1}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build & push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER__HUB_USERNAME }}/peeny-backend:latest
+
+      - name: Build & push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          dockerfile: Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Prepare SSH known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Login and update containers
+            docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
+            
+            # Pull the latest images
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+            docker pull ${{ secrets.DOCKER_HUB_PASSWORD }}/peeny-frontend:latest
+
+            # Stop old containers
+            docker stop peeny-backend || true
+            docker rm peeny-backend || true
+            docker stop peeny-frontend || true
+            docker rm peeny-frontend || true
+
+            # Run new containers
+            docker run -d --name peeny-backend \
+              -p 5000:5000 --restart unless-stopped \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+
+            docker run -d --name peeny-frontend \
+              -p 80:80 --restart unless-stopped \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
