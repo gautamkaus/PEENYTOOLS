@@ -45,6 +45,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -66,12 +67,12 @@ jobs:
 
             # Create the docker-compose.yml file
             echo "🔄 Writing docker-compose.yml..."
-            cat > docker-compose.yml <<EOF
+            cat > docker-compose.yml << 'END_OF_COMPOSE'
 version: "3.8"
 
 services:
   backend:
-    image: ${DOCKER_HUB_USERNAME:-${{ secrets.DOCKER_HUB_USERNAME }}}/peeny-backend:latest
+    image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -100,7 +101,7 @@ services:
 networks:
   app-network:
     driver: bridge
-EOF
+END_OF_COMPOSE
 
             # Stop any running containers
             echo "🛑 Stopping existing containers..."
