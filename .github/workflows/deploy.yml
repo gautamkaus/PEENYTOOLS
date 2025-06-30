@@ -55,9 +55,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "🚀 Deploying PeenyTools..."
-
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
-
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
@@ -67,7 +65,7 @@ version: '3.8'
 
 services:
   backend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest
+    image: \${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -82,7 +80,7 @@ services:
       - app-network
 
   frontend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest
+    image: \${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
     restart: unless-stopped
     environment:
       VITE_API_BASE_URL: http://backend:3000
@@ -101,5 +99,4 @@ EOF
             echo "🔄 Restarting services..."
             docker compose down
             docker compose up -d --pull always
-
             echo "✅ Deployment complete!"
