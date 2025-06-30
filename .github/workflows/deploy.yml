@@ -95,9 +95,7 @@ services:
 networks:
   app-network:
     driver: bridge
-EOF
 
-            echo "🔁 Restarting containers..."
-            docker compose down
-            docker compose up -d --pull always
-            echo "✅ Deployment complete!"
+      
+docker compose down
+docker compose up -d --pull always
