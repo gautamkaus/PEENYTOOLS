@@ -58,7 +58,6 @@ jobs:
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
-            # Write docker-compose.yml file on the server
             cat <<EOF > docker-compose.yml
             version: '3.8'
 
@@ -82,7 +81,7 @@ jobs:
                 image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
                 restart: unless-stopped
                 environment:
-                  VITE_API_BASE_URL: http://localhost:3000
+                  VITE_API_BASE_URL: http://backend:3000
                 depends_on:
                   - backend
                 expose:
@@ -95,6 +94,5 @@ jobs:
                 driver: bridge
             EOF
 
-            # Use docker compose to bring everything up
-            docker compose down
-            docker compose up -d
+            # Apply the new deployment without downtime
+            docker compose up -d --pull always
