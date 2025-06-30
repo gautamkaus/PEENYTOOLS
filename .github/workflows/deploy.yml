@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3  # supports multi-arch & BuildKit :contentReference[oaicite:1]{index=1}
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -53,26 +53,48 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           port: ${{ secrets.VPS_PORT }}
-          # key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            # Login and update containers
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
-            
-            # Pull the latest images
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
-            docker pull ${{ secrets.DOCKER_HUB_PASSWORD }}/peeny-frontend:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
-            # Stop old containers
-            docker stop peeny-backend || true
-            docker rm peeny-backend || true
-            docker stop peeny-frontend || true
-            docker rm peeny-frontend || true
+            # Write docker-compose.yml file on the server
+            cat <<EOF > docker-compose.yml
+            version: '3.8'
 
-            # Run new containers
-            docker run -d --name peeny-backend \
-              -p 5000:5000 --restart unless-stopped \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+            services:
+              backend:
+                image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+                restart: unless-stopped
+                environment:
+                  DB_HOST: 93.127.206.203
+                  DB_USER: ptadmin
+                  DB_PASSWORD: iE6IApsCDfNsVAdurDdK
+                  DB_NAME: peenytoolsdb
+                  DB_PORT: 3306
+                  JWT_SECRET: pennytools-ai-shopfront-secure-jwt-secret-key-2024
+                ports:
+                  - "3000:3000"
+                networks:
+                  - app-network
 
-            docker run -d --name peeny-frontend \
-              -p 80:80 --restart unless-stopped \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
+              frontend:
+                image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
+                restart: unless-stopped
+                environment:
+                  VITE_API_BASE_URL: http://localhost:3000
+                depends_on:
+                  - backend
+                ports:
+                  - "80:80"
+                networks:
+                  - app-network
+
+            networks:
+              app-network:
+                driver: bridge
+            EOF
+
+            # Use docker compose to bring everything up
+            docker compose down
+            docker compose up -d
