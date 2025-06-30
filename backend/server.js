@@ -10,9 +10,22 @@ dotenv.config();
 
 const app = express();
 
-// Configure CORS for cloud environment
+const PORT = process.env.PORT || 3000;
+
+// Log env vars related to DB (just for debugging - remove in prod)
+console.log("🔧 DB config:");
+console.log(`DB_HOST: ${process.env.DB_HOST}`);
+console.log(`DB_PORT: ${process.env.DB_PORT}`);
+console.log(`DB_USER: ${process.env.DB_USER}`);
+console.log(`DB_NAME: ${process.env.DB_NAME}`);
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://www.peenytools.store' , 'http://localhost:8080'], // Add your cloud domain
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://www.peenytools.store',
+    'http://localhost:8080'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -24,35 +37,32 @@ app.use('/api', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
-const PORT = process.env.PORT || 3000;
-
-// Test database connection and start server
+// Function to connect to DB and start server
 async function startServer() {
-  let retries = 3;
-  
+  const maxRetries = 5;
+  let retries = maxRetries;
+
   while (retries > 0) {
     try {
-      console.log(`Testing database connection... (attempt ${4 - retries}/3)`);
+      console.log(`🔄 Attempting DB connection... (${maxRetries - retries + 1}/${maxRetries})`);
       await sequelize.authenticate();
-      console.log('✅ Database connection established successfully.');
-      
+      console.log('✅ Database connection established.');
+
       app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`🚀 Server listening on port ${PORT}`);
       });
-      return; // Success, exit the retry loop
-    } catch (error) {
-      retries--;
-      console.error(`❌ Database connection failed (${4 - retries}/3):`, error.message);
-      
-      if (retries > 0) {
-        console.log(`Retrying in 5 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      } else {
-        console.error('❌ Failed to start server after 3 attempts:', error.message);
+
+      break; // Exit loop if success
+    } catch (err) {
+      console.error(`❌ Database connection failed: ${err.message}`);
+      if (--retries === 0) {
+        console.error('💥 Exiting: Could not connect to DB after multiple attempts.');
         process.exit(1);
       }
+      console.log('⏳ Retrying in 5 seconds...');
+      await new Promise(res => setTimeout(res, 5000));
     }
   }
 }
 
-startServer(); 
+startServer();
