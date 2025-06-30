@@ -112,6 +112,16 @@ jobs:
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest || { echo "Failed to pull frontend image"; exit 1; }
             echo "🛑 Stopping existing containers..."
             docker compose down || { echo "Failed to stop containers"; exit 1; }
+            echo "🔍 Checking for port 3000 conflicts..."
+            if lsof -i :3000; then
+              echo "⚠️ Port 3000 is in use, attempting to free it..."
+              docker ps -q --filter "publish=3000" | xargs -r docker stop || { echo "Failed to stop containers using port 3000"; exit 1; }
+              docker ps -a -q --filter "publish=3000" | xargs -r docker rm || { echo "Failed to remove containers using port 3000"; exit 1; }
+              if lsof -i :3000; then
+                echo "❌ Port 3000 still in use by non-Docker process, please free it manually"
+                exit 1
+              fi
+            fi
             echo "🚀 Starting containers..."
             docker compose up -d || { echo "Failed to start containers"; exit 1; }
             echo "✅ Deployment completed successfully!"
