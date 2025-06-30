@@ -55,16 +55,18 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "🚀 Deploying PeenyTools..."
+
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
             echo "🔄 Writing docker-compose.yml..."
-            echo 'version: "3.8"
+            cat > docker-compose.yml <<EOF
+version: "3.8"
 
 services:
   backend:
-    image: '${{ secrets.DOCKER_HUB_USERNAME }}'/peeny-backend:latest
+    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -79,7 +81,7 @@ services:
       - app-network
 
   frontend:
-    image: '${{ secrets.DOCKER_HUB_USERNAME }}'/peeny-frontend:latest
+    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest
     restart: unless-stopped
     environment:
       VITE_API_BASE_URL: http://backend:3000
@@ -92,7 +94,8 @@ services:
 
 networks:
   app-network:
-    driver: bridge' > docker-compose.yml
+    driver: bridge
+EOF
 
             echo "🔄 Restarting services..."
             docker compose down
