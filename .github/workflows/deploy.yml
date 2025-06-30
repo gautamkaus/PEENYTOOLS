@@ -55,12 +55,16 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "🚀 Deploying PeenyTools..."
+
+            # Login to Docker Hub
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
 
+            # Pull the latest Docker images
             echo "🔄 Pulling latest Docker images..."
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
+            # Create the docker-compose.yml file
             echo "🔄 Writing docker-compose.yml..."
             cat > docker-compose.yml <<EOF
 version: "3.8"
@@ -98,8 +102,10 @@ networks:
     driver: bridge
 EOF
 
+            # Stop any running containers
             echo "🛑 Stopping existing containers..."
             docker compose down
 
+            # Start containers with the latest images
             echo "🚀 Starting containers..."
             docker compose up -d --pull always
