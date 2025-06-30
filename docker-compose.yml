@@ -1,9 +1,8 @@
-cat <<EOF > docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+    image:  ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -24,12 +23,11 @@ services:
       VITE_API_BASE_URL: http://backend:3000
     depends_on:
       - backend
-    expose:
-      - "80"
+    ports:
+      - "80:80"
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
-EOF
