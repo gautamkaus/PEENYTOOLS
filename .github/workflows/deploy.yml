@@ -51,41 +51,39 @@ jobs:
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
         run: |
-          cat > docker-compose.yml << 'EOF'
-version: "3.8"
-
-services:
-  backend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest
-    restart: unless-stopped
-    environment:
-      DB_HOST: 93.127.206.203
-      DB_USER: ptadmin
-      DB_PASSWORD: iE6IApsCDfNsVAdurDdK
-      DB_NAME: peenytoolsdb
-      DB_PORT: 3306
-      JWT_SECRET: pennytools-ai-shopfront-secure-jwt-secret-key-2024
-    ports:
-      - "3000:3000"
-    networks:
-      - app-network
-
-  frontend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest
-    restart: unless-stopped
-    environment:
-      VITE_API_BASE_URL: http://backend:3000
-    depends_on:
-      - backend
-    ports:
-      - "80:80"
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
-EOF
+          echo "version: \"3.8\"" > docker-compose.yml
+          echo "" >> docker-compose.yml
+          echo "services:" >> docker-compose.yml
+          echo "  backend:" >> docker-compose.yml
+          echo "    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest" >> docker-compose.yml
+          echo "    restart: unless-stopped" >> docker-compose.yml
+          echo "    environment:" >> docker-compose.yml
+          echo "      DB_HOST: 93.127.206.203" >> docker-compose.yml
+          echo "      DB_USER: ptadmin" >> docker-compose.yml
+          echo "      DB_PASSWORD: iE6IApsCDfNsVAdurDdK" >> docker-compose.yml
+          echo "      DB_NAME: peenytoolsdb" >> docker-compose.yml
+          echo "      DB_PORT: 3306" >> docker-compose.yml
+          echo "      JWT_SECRET: pennytools-ai-shopfront-secure-jwt-secret-key-2024" >> docker-compose.yml
+          echo "    ports:" >> docker-compose.yml
+          echo "      - \"3000:3000\"" >> docker-compose.yml
+          echo "    networks:" >> docker-compose.yml
+          echo "      - app-network" >> docker-compose.yml
+          echo "" >> docker-compose.yml
+          echo "  frontend:" >> docker-compose.yml
+          echo "    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest" >> docker-compose.yml
+          echo "    restart: unless-stopped" >> docker-compose.yml
+          echo "    environment:" >> docker-compose.yml
+          echo "      VITE_API_BASE_URL: http://backend:3000" >> docker-compose.yml
+          echo "    depends_on:" >> docker-compose.yml
+          echo "      - backend" >> docker-compose.yml
+          echo "    ports:" >> docker-compose.yml
+          echo "      - \"80:80\"" >> docker-compose.yml
+          echo "    networks:" >> docker-compose.yml
+          echo "      - app-network" >> docker-compose.yml
+          echo "" >> docker-compose.yml
+          echo "networks:" >> docker-compose.yml
+          echo "  app-network:" >> docker-compose.yml
+          echo "    driver: bridge" >> docker-compose.yml
 
       - name: Transfer docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.4
@@ -106,24 +104,14 @@ EOF
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "🚀 Deploying PeenyTools..."
-
-            # Navigate to deployment directory
+            mkdir -p /home/${{ secrets.VPS_USER }}/peenytools || { echo "Failed to create deployment directory"; exit 1; }
             cd /home/${{ secrets.VPS_USER }}/peenytools || { echo "Failed to navigate to deployment directory"; exit 1; }
-
-            # Login to Docker Hub
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}" || { echo "Docker login failed"; exit 1; }
-
-            # Pull the latest Docker images
             echo "🔄 Pulling latest Docker images..."
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest || { echo "Failed to pull backend image"; exit 1; }
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest || { echo "Failed to pull frontend image"; exit 1; }
-
-            # Stop any running containers
             echo "🛑 Stopping existing containers..."
             docker compose down || { echo "Failed to stop containers"; exit 1; }
-
-            # Start containers with the latest images
             echo "🚀 Starting containers..."
             docker compose up -d || { echo "Failed to start containers"; exit 1; }
-
             echo "✅ Deployment completed successfully!"
