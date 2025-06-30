@@ -49,6 +49,8 @@ jobs:
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
@@ -58,12 +60,12 @@ jobs:
             echo "🚀 Deploying PeenyTools..."
 
             # Login to Docker Hub
-            docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
+            docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}" || { echo "Docker login failed"; exit 1; }
 
             # Pull the latest Docker images
             echo "🔄 Pulling latest Docker images..."
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
+            docker pull $DOCKER_HUB_USERNAME/peeny-backend:latest || { echo "Failed to pull backend image"; exit 1; }
+            docker pull $DOCKER_HUB_USERNAME/peeny-frontend:latest || { echo "Failed to pull frontend image"; exit 1; }
 
             # Create the docker-compose.yml file
             echo "🔄 Writing docker-compose.yml..."
@@ -72,7 +74,7 @@ version: "3.8"
 
 services:
   backend:
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
+    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -87,7 +89,7 @@ services:
       - app-network
 
   frontend:
-    image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
+    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest
     restart: unless-stopped
     environment:
       VITE_API_BASE_URL: http://backend:3000
@@ -105,8 +107,10 @@ END_OF_COMPOSE
 
             # Stop any running containers
             echo "🛑 Stopping existing containers..."
-            docker compose down
+            docker compose down || { echo "Failed to stop containers"; exit 1; }
 
             # Start containers with the latest images
             echo "🚀 Starting containers..."
-            docker compose up -d --pull always
+            docker compose up -d --pull always || { echo "Failed to start containers"; exit 1; }
+
+            echo "✅ Deployment completed successfully!"
