@@ -55,8 +55,9 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             echo "🚀 Deploying PeenyTools..."
-
             docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+            echo "🔄 Pulling latest Docker images..."
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-backend:latest
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
 
@@ -95,7 +96,10 @@ services:
 networks:
   app-network:
     driver: bridge
+EOF
 
-      
-docker compose down
-docker compose up -d --pull always
+            echo "🛑 Stopping existing containers..."
+            docker compose down
+
+            echo "🚀 Starting containers..."
+            docker compose up -d --pull always
