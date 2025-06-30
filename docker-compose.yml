@@ -20,7 +20,7 @@ services:
     image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
     restart: unless-stopped
     environment:
-      VITE_API_BASE_URL: http://backend:3000
+      VITE_API_BASE_URL: http://93.127.206.203:3000
     depends_on:
       - backend
     ports:
