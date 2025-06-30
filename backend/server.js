@@ -23,10 +23,8 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://www.peenytools.store',
-    'http://localhost:8080',
     'http://93.127.206.203',
-    'http://93.127.206.203*'
+    'https://www.peenytools.store'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
