@@ -66,7 +66,7 @@ version: "3.8"
 
 services:
   backend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest
+    image: ${DOCKER_HUB_USERNAME:-${{ secrets.DOCKER_HUB_USERNAME }}}/peeny-backend:latest
     restart: unless-stopped
     environment:
       DB_HOST: 93.127.206.203
@@ -81,7 +81,7 @@ services:
       - app-network
 
   frontend:
-    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest
+    image: ${{ secrets.DOCKER_HUB_USERNAME }}/peeny-frontend:latest
     restart: unless-stopped
     environment:
       VITE_API_BASE_URL: http://backend:3000
@@ -97,7 +97,7 @@ networks:
     driver: bridge
 EOF
 
-            echo "🔄 Restarting services..."
+            echo "🔁 Restarting containers..."
             docker compose down
             docker compose up -d --pull always
             echo "✅ Deployment complete!"
