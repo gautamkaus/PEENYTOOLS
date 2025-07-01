@@ -52,7 +52,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
-          echo "version: \"3.9\"" > docker-compose.yml
+          echo "version: '3.9'" > docker-compose.yml
           echo "services:" >> docker-compose.yml
           echo "  backend:" >> docker-compose.yml
           echo "    image: ${DOCKER_HUB_USERNAME}/peeny-backend:latest" >> docker-compose.yml
@@ -60,16 +60,16 @@ jobs:
           echo "    environment:" >> docker-compose.yml
           echo "      DB_HOST: 93.127.206.203" >> docker-compose.yml
           echo "      DB_USER: ptadmin" >> docker-compose.yml
-          echo "      DB_PASSWORD: \"${DB_PASSWORD}\"" >> docker-compose.yml
+          echo "      DB_PASSWORD: '${DB_PASSWORD}'" >> docker-compose.yml
           echo "      DB_NAME: peenytoolsdb" >> docker-compose.yml
           echo "      DB_PORT: 3306" >> docker-compose.yml
-          echo "      JWT_SECRET: \"${JWT_SECRET}\"" >> docker-compose.yml
+          echo "      JWT_SECRET: '${JWT_SECRET}'" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
-          echo "      - \"3000:3000\"" >> docker-compose.yml
+          echo "      - '3000:3000'" >> docker-compose.yml
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo '      test: ["CMD", "curl", "--fail", "http://93.127.206.203:3000"]' >> docker-compose.yml
+          echo "      test: ['CMD', 'curl', '--fail', 'http://93.127.206.203:3000']" >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
@@ -77,15 +77,15 @@ jobs:
           echo "    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest" >> docker-compose.yml
           echo "    restart: unless-stopped" >> docker-compose.yml
           echo "    environment:" >> docker-compose.yml
-          echo "      VITE_API_BASE_URL: \"http://93.127.206.203:3000\"" >> docker-compose.yml
+          echo "      VITE_API_BASE_URL: 'http://93.127.206.203:3000'" >> docker-compose.yml
           echo "    depends_on:" >> docker-compose.yml
           echo "      - backend" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
-          echo "      - \"3001:3000\"" >> docker-compose.yml
+          echo "      - '3001:3000'" >> docker-compose.yml
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo '      test: ["CMD", "curl", "--fail", "http://93.127.206.203:3000\"]' >> docker-compose.yml
+          echo "      test: ['CMD', 'curl', '--fail', 'http://93.127.206.203:3000']" >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
