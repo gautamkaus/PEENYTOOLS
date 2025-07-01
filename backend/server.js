@@ -38,11 +38,6 @@ app.use('/api', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
-// Add a root route for health check or info
-app.get('/', (req, res) => {
-  res.send('PennyTools API is running!');
-});
-
 // Function to connect to DB and start server
 async function startServer() {
   const maxRetries = 5;
