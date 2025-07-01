@@ -69,7 +69,7 @@ jobs:
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo "      test: [\"CMD\", \"curl\", \"--fail\", \"http://93.127.206.203:3000\"]" >> docker-compose.yml
+          echo "      test: [\"CMD\", \"curl\", \"--fail\", \"https://www.pennytools.store/api"]" >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
@@ -77,7 +77,7 @@ jobs:
           echo "    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest" >> docker-compose.yml
           echo "    restart: unless-stopped" >> docker-compose.yml
           echo "    environment:" >> docker-compose.yml
-          echo "      VITE_API_BASE_URL: http://93.127.206.203:3000" >> docker-compose.yml
+          echo "      VITE_API_BASE_URL: https://www.pennytools.store/api" >> docker-compose.yml
           echo "    depends_on:" >> docker-compose.yml
           echo "      - backend" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
@@ -85,7 +85,7 @@ jobs:
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo "      test: [\"CMD\", \"curl\", \"--fail\", \"http://93.127.206.203:3000\"]" >> docker-compose.yml
+          echo "      test: [\"CMD\", \"curl\", \"--fail\", \"https://www.pennytools.store/api"]" >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
