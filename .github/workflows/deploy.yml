@@ -85,7 +85,7 @@ jobs:
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo "      test: ['CMD', 'curl', '--fail', 'http://93.127.206.203:3000']" >> docker-compose.yml
+          echo "      test: ['CMD', 'curl', '--fail', 'http://93.127.206.203:3001']" >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
