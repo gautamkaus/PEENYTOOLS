@@ -77,7 +77,7 @@ jobs:
           echo "    image: ${DOCKER_HUB_USERNAME}/peeny-frontend:latest" >> docker-compose.yml
           echo "    restart: unless-stopped" >> docker-compose.yml
           echo "    environment:" >> docker-compose.yml
-          echo "      VITE_API_BASE_URL: "https://www.pennytools.store/api" >> docker-compose.yml
+          echo "      VITE_API_BASE_URL: \"https://www.pennytools.store/api\"" >> docker-compose.yml
           echo "    depends_on:" >> docker-compose.yml
           echo "      - backend" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
