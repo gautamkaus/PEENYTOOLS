@@ -81,7 +81,7 @@ jobs:
           echo "    depends_on:" >> docker-compose.yml
           echo "      - backend" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
-          echo "      - \"80:3000\"" >> docker-compose.yml
+          echo "      - \"3001:3000\"" >> docker-compose.yml
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
@@ -119,7 +119,7 @@ jobs:
             echo "🛑 Stopping existing containers..."
             docker compose down || { echo "Failed to stop containers"; exit 1; }
             echo "🔍 Checking for port conflicts..."
-            for port in 80 3000; do
+            for port in 3001 3000; do
               if lsof -i :$port; then
                 echo "⚠️ Port $port is in use, attempting to free it..."
                 docker ps -q --filter "publish=$port" | xargs -r docker stop || { echo "Failed to stop containers using port $port"; exit 1; }
