@@ -60,16 +60,16 @@ jobs:
           echo "    environment:" >> docker-compose.yml
           echo "      DB_HOST: 93.127.206.203" >> docker-compose.yml
           echo "      DB_USER: ptadmin" >> docker-compose.yml
-          echo "      DB_PASSWORD: ${DB_PASSWORD}" >> docker-compose.yml
+          echo "      DB_PASSWORD: \"${DB_PASSWORD}\"" >> docker-compose.yml
           echo "      DB_NAME: peenytoolsdb" >> docker-compose.yml
           echo "      DB_PORT: 3306" >> docker-compose.yml
-          echo "      JWT_SECRET: ${JWT_SECRET}" >> docker-compose.yml
+          echo "      JWT_SECRET: \"${JWT_SECRET}\"" >> docker-compose.yml
           echo "    ports:" >> docker-compose.yml
           echo "      - \"3000:3000\"" >> docker-compose.yml
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo "      test: ["CMD", "curl", "--fail", "https://www.pennytools.store/api"]' >> docker-compose.yml
+          echo '      test: ["CMD", "curl", "--fail", "https://www.pennytools.store/api"]' >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
@@ -85,7 +85,7 @@ jobs:
           echo "    networks:" >> docker-compose.yml
           echo "      - app-network" >> docker-compose.yml
           echo "    healthcheck:" >> docker-compose.yml
-          echo "      test: ["CMD", "curl", "--fail", "https://www.pennytools.store/api"]' >> docker-compose.yml
+          echo '      test: ["CMD", "curl", "--fail", "https://www.pennytools.store/api"]' >> docker-compose.yml
           echo "      interval: 30s" >> docker-compose.yml
           echo "      timeout: 3s" >> docker-compose.yml
           echo "      retries: 3" >> docker-compose.yml
