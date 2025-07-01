@@ -1,1 +1,1 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://www.pennytools.store/api'; 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://backend:3000'; 
