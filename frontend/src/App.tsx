@@ -34,7 +34,7 @@ const WhatsAppPopover = () => {
 
   const handleWhatsAppClick = () => {
     const message = "Hi, I'm interested in purchasing an AI tool from PennyTools. Could you please assist me with the available options, pricing, and the buying process? Thank you!";
-    window.open(`https://wa.me/+918626027614?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/+918975170356?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

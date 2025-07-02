@@ -110,7 +110,7 @@ const Cart = () => {
     ).join('\n');
     
     const message = `Hi, I want to place an order:\n\n${orderDetails}\n\nTotal: ${formatINR(finalTotal)}`;
-    window.open(`https://wa.me/+918626027614?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/+918975170356?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleLogout = () => {

@@ -36,7 +36,7 @@ const Index = () => {
   }, []);
 
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/+918626027614?text=Hi,%20I%27m%20interested%20in%20PennyTools%20AI%20products.', '_blank');
+    window.open('https://wa.me/+918975170356?text=Hi,%20I%27m%20interested%20in%20PennyTools%20AI%20products.', '_blank');
   };
 
   return (

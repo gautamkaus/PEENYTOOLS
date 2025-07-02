@@ -129,7 +129,7 @@ const Checkout = () => {
       
       const message = `Order Confirmation:\n\nCustomer: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nUPI ID: ${formData.upiId}\nTransaction ID: ${formData.transactionId}\n\nItems:\n${orderDetails}\n\nTotal: ${formatINR(finalTotal)}\nPaid Amount: ${formatINR(finalTotal)}\n\nPlease confirm and provide access.`;
       
-      window.open(`https://wa.me/+918626027614?text=${encodeURIComponent(message)}`, '_blank');
+      window.open(`https://wa.me/+918975170356?text=${encodeURIComponent(message)}`, '_blank');
       
       setTimeout(() => {
         navigate('/');
@@ -152,7 +152,7 @@ const Checkout = () => {
     ).join('\n');
     
     const message = `Hi, I want to complete my checkout:\n\n${orderDetails}\n\nTotal: ${formatINR(finalTotal)}\n\nPlease assist me with the payment process.`;
-    window.open(`https://wa.me/+918626027614?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/+918975170356?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
