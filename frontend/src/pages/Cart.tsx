@@ -159,21 +159,7 @@ const Cart = () => {
                       <div className="flex flex-col items-end space-y-2">
                         <div className="flex items-center space-x-2">
                           <label className="text-sm font-medium">Duration:</label>
-                          <Select 
-                            value={item.duration.toString()} 
-                            onValueChange={(value) => updateDuration(item.cartId, parseInt(value))}
-                          >
-                            <SelectTrigger className="w-40">
-                              <SelectValue placeholder="Select duration" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {item.rates?.sort((a,b) => a.duration - b.duration).map(rate => (
-                                <SelectItem key={rate.duration} value={rate.duration.toString()}>
-                                  {rate.duration} {rate.duration === 1 ? 'month' : 'months'}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <span className="text-base font-semibold">{item.duration} {item.duration === 1 ? 'month' : 'months'}</span>
                         </div>
                         
                         <div className="text-right">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, Filter } from 'lucide-react';
+import { ShoppingCart, Search, Filter, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { API_BASE_URL } from '../lib/config';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
@@ -30,6 +31,7 @@ const Products = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -241,14 +243,15 @@ const Products = () => {
       {/* Products Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {products.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onAddToCart={addToCart}
-                onBuyNow={buyNow}
-              />
+              <div className="break-inside-avoid mb-6" key={product.id}>
+                <ProductCard 
+                  product={product} 
+                  onAddToCart={addToCart}
+                  onBuyNow={buyNow}
+                />
+              </div>
             ))}
           </div>
 
@@ -268,9 +271,12 @@ const Products = () => {
 
 const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
   const [selectedDuration, setSelectedDuration] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
   
   // Get available durations from product rates
-  const availableDurations = product.rates?.map(rate => rate.duration).sort((a, b) => a - b) || [];
+  const durationsRaw = (product.rates || []).map(rate => Number(rate.duration)).filter(d => typeof d === 'number' && !isNaN(d));
+  const availableDurations = Array.from(new Set(durationsRaw)) as number[];
+  availableDurations.sort((a, b) => a - b);
   
   // Set default selected duration to first available
   useEffect(() => {
@@ -303,116 +309,105 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
   const selectedPrice = getPriceForDuration(parseInt(selectedDuration));
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md">
-      <div className="relative overflow-hidden rounded-t-lg">
-        <img 
-          src={product.image || "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop&auto=format&q=80"} 
-          alt={product.name}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-        />
-        {product.discount > 0 && (
-          <Badge className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 hover:bg-yellow-400 animate-pulse">
-            -{product.discount}%
-          </Badge>
-        )}
-        {product.featured && (
-          <Badge className="absolute top-4 left-4 bg-blue-400 text-white hover:bg-blue-400">
-            Featured
-          </Badge>
-        )}
-      </div>
-      
-      <CardHeader>
-        <CardTitle className="text-xl">{product.name}</CardTitle>
-        <ul className="text-gray-600 space-y-1 mt-2">
+    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className="group transition-all duration-300 border border-gray-200 shadow-md cursor-pointer w-[320px] h-[480px] flex flex-col justify-between hover:shadow-[0_8px_32px_0_rgba(59,130,246,0.25)] hover:border-blue-400 p-4"
+          onMouseEnter={() => setPopoverOpen(true)}
+          onMouseLeave={() => setPopoverOpen(false)}
+        >
+          <div className="relative overflow-hidden rounded-t-lg h-40 w-full flex-shrink-0">
+            <img
+              src={product.image || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop&auto=format&q=80'}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <CardHeader>
+            <CardTitle className="text-xl">{product.name}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col justify-between">
+            {availableDurations.length > 0 ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subscription Duration
+                  </label>
+                  <Select value={selectedDuration} onValueChange={value => setSelectedDuration(value)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableDurations.map(duration => {
+                        const price = getPriceForDuration(duration);
+                        return (
+                          <SelectItem key={`${product.id}-${duration}`} value={duration.toString()}>
+                            {duration} {duration === 1 ? 'month' : 'months'} - {formatINR(price)}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-blue-600">
+                      {formatINR(selectedPrice)}
+                    </span>
+                    <span className="block text-sm text-gray-500">
+                      for {selectedDuration} {parseInt(selectedDuration) === 1 ? 'month' : 'months'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800"
+                    disabled={!selectedDuration}
+                  >
+                    Add to Cart
+                  </Button>
+                  <Button 
+                    onClick={handleBuyNow}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={!selectedDuration}
+                  >
+                    Buy Now
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-gray-500 py-8 flex-1 flex flex-col justify-center">
+                No pricing available
+                <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                  <Button className="w-full" disabled>
+                    Add to Cart
+                  </Button>
+                  <Button className="w-full" disabled>
+                    Buy Now
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent side="right" className="break-words break-all whitespace-pre-line w-80">
+        <ul className="text-gray-600 space-y-1 text-sm">
           {product.description.split('\n').map((line, idx) => {
             const isNegative = /\b(no|not|without|none)\b/i.test(line);
             const emoji = isNegative ? '❌' : '✅';
             return (
-              <li key={idx} className="flex items-start gap-2">
+              <li key={`${product.id}-desc-${idx}`} className="flex items-start gap-2 w-full">
                 <span className="text-lg">{emoji}</span>
-                <span>{line.trim()}</span>
+                <span className="block w-full truncate break-words break-all whitespace-pre-line">{line.trim()}</span>
               </li>
             );
           })}
         </ul>
-      </CardHeader>
-      
-      <CardContent>
-        {availableDurations.length > 0 ? (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subscription Duration
-              </label>
-              <ToggleGroup
-                type="single"
-                value={selectedDuration}
-                onValueChange={(value) => {
-                  if (value) setSelectedDuration(value);
-                }}
-                className="flex flex-wrap gap-2"
-                aria-label="Subscription duration"
-              >
-                {availableDurations.map(duration => {
-                  const price = getPriceForDuration(duration);
-                  return (
-                    <ToggleGroupItem
-                      key={duration}
-                      value={duration.toString()}
-                      className="data-[state=on]:bg-blue-600 data-[state=on]:text-white border-gray-300"
-                    >
-                      {duration} {duration === 1 ? 'month' : 'months'} - {formatINR(price)}
-                    </ToggleGroupItem>
-                  );
-                })}
-              </ToggleGroup>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-center">
-                <span className="text-2xl font-bold text-blue-600">
-                  {formatINR(selectedPrice)}
-                </span>
-                <span className="block text-sm text-gray-500">
-                  for {selectedDuration} {parseInt(selectedDuration) === 1 ? 'month' : 'months'}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button 
-                onClick={handleAddToCart}
-                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800"
-                disabled={!selectedDuration}
-              >
-                Add to Cart
-              </Button>
-              <Button 
-                onClick={handleBuyNow}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={!selectedDuration}
-              >
-                Buy Now
-              </Button>
-            </div>
-          </>
-        ) : (
-          <div className="text-center text-gray-500 py-8">
-            No pricing available
-            <div className="flex flex-col sm:flex-row gap-2 mt-4">
-              <Button className="w-full" disabled>
-                Add to Cart
-              </Button>
-              <Button className="w-full" disabled>
-                Buy Now
-              </Button>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </PopoverContent>
+    </Popover>
   );
 };
 

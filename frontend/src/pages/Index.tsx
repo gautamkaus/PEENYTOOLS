@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,12 +10,72 @@ import NeonText from '@/components/ui/NeonText';
 import HolographicButton from '@/components/ui/HolographicButton';
 import axios from 'axios';
 import { API_BASE_URL } from '../lib/config';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 // Helper for Indian Rupee formatting
 const formatINR = (value) => {
   if (isNaN(value)) return value;
   return value.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 });
 };
+
+function FeaturedToolCard({ tool }) {
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  return (
+    <motion.div
+      key={tool.id}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.2, duration: 0.8 }}
+    >
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <div
+            className="group transition-all duration-300 border border-gray-200 shadow-md cursor-pointer w-[320px] h-[320px] flex flex-col justify-between hover:shadow-[0_8px_32px_0_rgba(59,130,246,0.25)] hover:border-blue-400 p-4"
+            onMouseEnter={() => setPopoverOpen(true)}
+            onMouseLeave={() => setPopoverOpen(false)}
+          >
+            <div className="relative overflow-hidden rounded-t-lg h-40 w-full flex-shrink-0">
+              <img
+                src={tool.image || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=200&fit=crop&auto=format&q=80'}
+                alt={tool.name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <Badge className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 hover:bg-yellow-400 animate-pulse">
+                -{tool.discount}%
+              </Badge>
+            </div>
+            <CardHeader>
+              <CardTitle className="text-xl">{tool.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col justify-end">
+              <Link to={`/products?tool=${tool.id}`}>
+                <HolographicButton className="w-full">
+                  Get Started
+                </HolographicButton>
+              </Link>
+            </CardContent>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent side="right" className="break-words break-all whitespace-pre-line w-80">
+          <ul className="text-gray-600 space-y-1 text-sm">
+            {tool.description.split('\n').map((line, idx) => {
+              const isNegative = /\b(no|not|without|none)\b/i.test(line);
+              const emoji = isNegative ? '❌' : '✅';
+              return (
+                <li key={`${tool.id}-desc-${idx}`} className="flex items-start gap-2 w-full">
+                  <span className="text-lg">{emoji}</span>
+                  <span className="block w-full truncate break-words break-all whitespace-pre-line">{line.trim()}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </PopoverContent>
+      </Popover>
+    </motion.div>
+  );
+}
 
 const Index = () => {
   const [featuredTools, setFeaturedTools] = useState([]);
@@ -112,56 +172,9 @@ const Index = () => {
           ) : featuredTools.length === 0 ? (
             <div className="text-center text-gray-500">No featured products available.</div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
               {featuredTools.map((tool) => (
-                <motion.div
-                  key={tool.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2, duration: 0.8 }}
-                >
-                  <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md overflow-hidden">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="relative overflow-hidden rounded-t-lg"
-                    >
-                      <img 
-                        src={tool.image} 
-                        alt={tool.name}
-                        className="w-full h-48 object-cover transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <Badge className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 hover:bg-yellow-400 animate-pulse">
-                        -{tool.discount}%
-                      </Badge>
-                    </motion.div>
-                    
-                    <CardHeader>
-                      <CardTitle className="text-xl">{tool.name}</CardTitle>
-                      <ul className="text-gray-600 space-y-1 mt-2">
-                        {tool.description.split('\n').map((line, idx) => {
-                          const isNegative = /\b(no|not|without|none)\b/i.test(line);
-                          const emoji = isNegative ? '❌' : '✅';
-                          return (
-                            <li key={idx} className="flex items-start gap-2">
-                              <span className="text-lg">{emoji}</span>
-                              <span>{line.trim()}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </CardHeader>
-                    
-                    <CardContent>
-                      <Link to={`/products?tool=${tool.id}`}>
-                        <HolographicButton className="w-full">
-                          Get Started
-                        </HolographicButton>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                <FeaturedToolCard key={tool.id} tool={tool} />
               ))}
             </div>
           )}

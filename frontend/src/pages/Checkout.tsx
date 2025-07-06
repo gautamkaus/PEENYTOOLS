@@ -218,12 +218,13 @@ const Checkout = () => {
                       <div className="bg-blue-50 p-4 rounded-lg mb-4">
                         <p className="font-semibold text-blue-800">Scan and Pay using any UPI app</p>
                         <div className="flex justify-center my-4">
-                          {/* Placeholder for QR Code */}
-                          <div className="w-40 h-40 bg-gray-300 flex items-center justify-center">
-                            <p>QR Code</p>
+                          <div style={{ width: 180, height: 180, margin: '0 auto', borderRadius: 8, overflow: 'hidden', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <img src="/phonepe-qr.jpg" alt="PhonePe QR Code" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           </div>
                         </div>
-                        <p className="text-center font-mono text-blue-700">pennytools@upi</p>
+                        <div className="text-center text-blue-700 mt-2" style={{ letterSpacing: 1 }}>
+                          8767261138-2@ybl
+                        </div>
                       </div>
 
                       <p className="mb-4 text-center text-sm font-bold text-red-600">
